@@ -7,7 +7,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/5plusspieldauer/gghockey/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/5plusspieldauer/gghockey/blob/v0.1.0/DESCRIPTION)
 
 Weinberger D (2026). *gghockey: Ice Hockey Rinks and Spatial Heatmaps
 for 'ggplot2'*. R package version 0.1.0,
