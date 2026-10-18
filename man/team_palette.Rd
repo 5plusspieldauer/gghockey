@@ -18,29 +18,28 @@ scale_fill_team(palette, which = c("primary", "secondary"), ...)
 \arguments{
 \item{team}{Team names (or ids), as they appear in your data.}
 
-\item{primary}{Primary colours, one per team: any colour R understands
-(hex codes like \code{"#C8102E"} or names like \code{"navy"}).}
+\item{primary}{Primary colours, one per team: any colour R understands (hex codes
+like \code{"#C8102E"} or names like \code{"navy"}).}
 
-\item{secondary}{Optional secondary colours, one per team (\code{NA} to fall back
-to the primary).}
+\item{secondary}{Optional secondary colours, one per team (\code{NA} to fall back to the
+primary).}
 
 \item{palette}{A palette from \code{team_palette()}.}
 
 \item{which}{\code{"primary"} or \code{"secondary"} colours.}
 
-\item{...}{Passed to \code{\link[ggplot2:scale_manual]{ggplot2::scale_colour_manual()}} /
-\code{\link[ggplot2:scale_manual]{ggplot2::scale_fill_manual()}}, e.g. \code{name} or \code{na.value}.}
+\item{...}{Passed to \code{\link[ggplot2:scale_manual]{ggplot2::scale_colour_manual()}} / \code{\link[ggplot2:scale_manual]{ggplot2::scale_fill_manual()}},
+e.g. \code{name} or \code{na.value}.}
 }
 \value{
-\code{team_palette()} returns a \code{gghockey_palette} data frame with
-columns \code{team}, \code{primary} and \code{secondary}. The scales return ggplot2
-scales.
+\code{team_palette()} returns a \code{gghockey_palette} data frame with columns
+\code{team}, \code{primary} and \code{secondary}. The scales return ggplot2 scales.
 }
 \description{
-\code{team_palette()} builds a palette from your own team colours (gghockey ships
-none) and \code{scale_colour_team()} / \code{scale_fill_team()} apply it, matching
-teams by name. Each team has a primary and, optionally, a secondary colour;
-a missing secondary falls back to the primary.
+\code{team_palette()} builds a palette from your own team colours (gghockey ships none)
+and \code{scale_colour_team()} / \code{scale_fill_team()} apply it, matching teams by name.
+Each team has a primary and, optionally, a secondary colour; a missing secondary
+falls back to the primary.
 }
 \examples{
 pal <- team_palette(
@@ -60,3 +59,6 @@ ggplot(shots, aes(x, y, colour = team)) +
 cols <- c(Lakeside = "#0B3D91", Northfield = "#C8102E")
 team_palette(names(cols), cols)
 }
+\keyword{plot,}
+\keyword{scales,}
+\keyword{teams}

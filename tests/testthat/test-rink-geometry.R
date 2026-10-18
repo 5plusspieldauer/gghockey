@@ -1,3 +1,7 @@
+# Rink geometry: tidy, in-bounds, drawn ice-first, mirror-symmetric end to end and
+# side to side, shifted by the dimensions' origin, and the goal line meets the boards
+# exactly where the corner arc says it should.
+
 test_that("rink_geometry() returns tidy, in-bounds markings", {
   geo <- rink_geometry(IIHF)
   expect_s3_class(geo, "data.frame")

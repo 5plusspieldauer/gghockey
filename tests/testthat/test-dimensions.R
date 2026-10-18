@@ -1,3 +1,6 @@
+# Rink dimensions: the built-in rinks have regulation sizes, and rink_dimensions()
+# rejects unknown fields, non-numbers and layouts that can't fit on a rink.
+
 test_that("built-in rinks have the regulation sizes", {
   expect_equal(c(IIHF$length, IIHF$width), c(60, 30))
   expect_equal(c(NHL$length, NHL$width), c(200, 85) * 0.3048)

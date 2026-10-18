@@ -1,3 +1,7 @@
+# Scales + team palettes: user limits are honoured (and squished), the diverging scale
+# stays symmetric around 0, size ranges are in rink units, and team_palette() catches
+# bad colours / duplicated teams when the palette is built, not at plot time.
+
 test_that("fill scales use user limits and squish out-of-range values", {
   s <- scale_fill_rink(limits = c(0, 0.2))
   expect_equal(s$get_limits(), c(0, 0.2))

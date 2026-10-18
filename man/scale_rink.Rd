@@ -44,25 +44,25 @@ scale_alpha_rink(
 \arguments{
 \item{name}{Legend title.}
 
-\item{palette}{A \code{\link[grDevices:palettes]{grDevices::hcl.colors()}} palette name (see
-\code{\link[grDevices:palettes]{grDevices::hcl.pals()}}), e.g. \code{"Viridis"}, \code{"Mako"} or \code{"Rocket"} for the
-sequential scale and \code{"Blue-Red 3"}, \code{"Vik"} or \code{"Purple-Green"} for the
-diverging one; or a vector of colours.}
+\item{palette}{A \code{\link[grDevices:palettes]{grDevices::hcl.colors()}} palette name (see \code{\link[grDevices:palettes]{grDevices::hcl.pals()}}),
+e.g. \code{"Viridis"}, \code{"Mako"} or \code{"Rocket"} for the sequential scale and
+\code{"Blue-Red 3"}, \code{"Vik"} or \code{"Purple-Green"} for the diverging one; or a vector of
+colours.}
 
-\item{limits}{Fill limits. For \code{scale_fill_rink_diverging()}, \code{NULL}
-derives symmetric limits \code{c(-a, a)} from the data.}
+\item{limits}{Fill limits. For \code{scale_fill_rink_diverging()}, \code{NULL} derives
+symmetric limits \code{c(-a, a)} from the data.}
 
-\item{breaks, labels}{Passed to the underlying scale. The defaults label only
-the ends of the bar (and \code{0} for the diverging scale); use e.g.
+\item{breaks, labels}{Passed to the underlying scale. The defaults label only the ends
+of the bar (and \code{0} for the diverging scale); use e.g.
 \verb{breaks = waiver(), labels = waiver()} for numeric labels.}
 
 \item{...}{Passed to the underlying ggplot2 scale.}
 
-\item{binwidth}{The \code{binwidth} given to \code{\link[=geom_rink_bin]{geom_rink_bin()}}. Square sides
-range over \code{frac * binwidth}.}
+\item{binwidth}{The \code{binwidth} given to \code{\link[=geom_rink_bin]{geom_rink_bin()}}. Square sides range over
+\code{frac * binwidth}.}
 
-\item{frac}{Smallest and largest square side, as a fraction of \code{binwidth}.
-The largest is capped at \code{1} (one full cell) so squares never overlap.}
+\item{frac}{Smallest and largest square side, as a fraction of \code{binwidth}. The
+largest is capped at \code{1} (one full cell) so squares never overlap.}
 
 \item{square_colour}{Fill colour of the legend squares.}
 
@@ -74,23 +74,19 @@ A ggplot2 scale.
 \description{
 Matched scales for the \code{\link[=geom_rink_bin]{geom_rink_bin()}} styles:
 \describe{
-\item{\code{scale_fill_rink()}}{Sequential fill for the cell mean, labelled
-Low / High at the ends by default. Used by every style.}
-\item{\code{scale_fill_rink_diverging()}}{Diverging fill centred on \code{0}, for
-maps of differences. Limits are symmetric around \code{0} (from the data
-unless you pass \code{limits}), so \code{0} sits at the neutral midpoint.}
-\item{\code{scale_size_rink()}}{Event-count \strong{size} scale for
-\code{style = "size"}. Square sides are set in rink units as a fraction of
-\code{binwidth}, so the largest square fills a cell and the smallest stays
-legible.}
-\item{\code{scale_alpha_rink()}}{Event-count \strong{alpha} scale for
-\code{style = "alpha"}.}
+\item{\code{scale_fill_rink()}}{Sequential fill for the cell mean, labelled Low / High
+at the ends by default. Used by every style.}
+\item{\code{scale_fill_rink_diverging()}}{Diverging fill centred on \code{0}, for maps of
+differences. Limits are symmetric around \code{0} (from the data unless you pass
+\code{limits}), so \code{0} sits at the neutral midpoint.}
+\item{\code{scale_size_rink()}}{Event-count \strong{size} scale for \code{style = "size"}. Square
+sides are set in rink units as a fraction of \code{binwidth}, so the largest square
+fills a cell and the smallest stays legible.}
+\item{\code{scale_alpha_rink()}}{Event-count \strong{alpha} scale for \code{style = "alpha"}.}
 }
-}
-\details{
-Fill limits are yours to choose: the default \code{NULL} uses the range of the
-data, which changes from plot to plot. Fix \code{limits} (values outside are
-squished to the ends) when several maps should share one colour key.
+Fill limits are yours to choose: the default \code{NULL} uses the range of the data, which
+changes from plot to plot. Fix \code{limits} (values outside are squished to the ends)
+when several maps should share one colour key.
 }
 \examples{
 library(ggplot2)
@@ -105,3 +101,5 @@ ggplot(shots, aes(x, y, z = xg)) +
 \seealso{
 \code{\link[=geom_rink_bin]{geom_rink_bin()}}
 }
+\keyword{plot,}
+\keyword{scales}

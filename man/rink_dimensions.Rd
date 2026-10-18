@@ -16,11 +16,9 @@ A named list of rink dimensions, usable wherever gghockey takes
 \code{dimensions}.
 }
 \description{
-Starts from an existing set of \link[=rink_dims]{rink dimensions} and overrides
-individual fields, checking that every override is a known field and a
-single finite number. Typical uses are matching your data's coordinate frame
-(e.g. \verb{origin_x = -30, origin_y = -15} for centre-ice-origin IIHF data) or
-drawing a non-standard rink.
+Starts from an existing set of \link[=rink_dims]{rink dimensions} and overrides single
+fields, checking that each override is a known field and a single finite number.
+Typical uses: matching your data's coordinate frame (e.g. \verb{origin_x = -30, origin_y = -15} for centre-ice-origin IIHF data) or drawing a non-standard rink.
 }
 \examples{
 # IIHF rink with the origin at centre ice
@@ -32,3 +30,5 @@ narrow <- rink_dimensions(IIHF, width = 26)
 \seealso{
 \link{rink_dims}
 }
+\keyword{dimensions}
+\keyword{rink,}

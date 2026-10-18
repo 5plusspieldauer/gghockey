@@ -15,27 +15,26 @@ theme_rink(
 \arguments{
 \item{base_size}{Base font size, in points.}
 
-\item{base_family}{Base font family. The default \code{""} uses the device's
-default sans-serif font.}
+\item{base_family}{Base font family. The default \code{""} uses the device's default
+sans-serif font.}
 
-\item{coord}{If \code{TRUE} (default), also return a 1:1
-\code{\link[ggplot2:coord_fixed]{ggplot2::coord_fixed()}} so the rink keeps its true proportions. Set
-\code{FALSE} when the plot already has a coordinate system, e.g. one added by
-\code{\link[=annotate_rink]{annotate_rink()}}.}
+\item{coord}{If \code{TRUE} (default), also return a 1:1 \code{\link[ggplot2:coord_fixed]{ggplot2::coord_fixed()}} so the
+rink keeps its true proportions. Set \code{FALSE} when the plot already has a coordinate
+system, e.g. one added by \code{\link[=annotate_rink]{annotate_rink()}}.}
 
 \item{strip_fill}{Fill colour of the facet strip labels.}
 
 \item{plot_margin}{Margin around the whole plot, in points.}
 }
 \value{
-A ggplot2 theme or, with \code{coord = TRUE}, a list of a theme and a
-coordinate system, to add to a plot.
+A ggplot2 theme or, with \code{coord = TRUE}, a list of a theme and a coordinate
+system, to add to a plot.
 }
 \description{
 A \code{\link[ggplot2:ggtheme]{ggplot2::theme_void()}}-based theme for rink plots: no axes, gridlines or
-backgrounds, so only the rink and its layers show. Titles are centred, facet
-strips are drawn as padded coloured chips and legends get some breathing
-room. \code{\link[=annotate_rink]{annotate_rink()}} adds it for you; call it yourself when you use
+backgrounds, so only the rink and its layers show. Titles are centred, facet strips
+are drawn as padded coloured chips and legends get some breathing room.
+\code{\link[=annotate_rink]{annotate_rink()}} adds it for you; call it yourself when you use
 \code{annotate_rink(theme = FALSE)} or want different settings.
 }
 \examples{
@@ -47,3 +46,5 @@ ggplot(shots, aes(x, y)) +
   facet_wrap(~period) +
   theme_rink(base_size = 10, coord = FALSE, strip_fill = "grey30")
 }
+\keyword{plot,}
+\keyword{theme}

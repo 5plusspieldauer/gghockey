@@ -1,19 +1,29 @@
+# =============================================================================
+# geom_rink_bin.R  --  binned heatmap of on-ice events (stat + geom + rink_bin()).
+#
+# Squares are drawn in RINK UNITS, not page mm: a cell's side is a length on the ice,
+# capped at `binwidth`, so squares can never overlap and a map looks identical at any
+# export size or zoom (point-based heatmaps change look with every ggsave()). The
+# binning itself lives in .bin_cells(), shared by the stat and rink_bin(), so a
+# precomputed map is cell-for-cell the same as the stat's.
+# =============================================================================
+
 StatRinkBin <- ggplot2::ggproto("StatRinkBin", ggplot2::Stat,
   required_aes = c("x", "y"),
   optional_aes = "z",
   dropped_aes = "z",
   default_aes = ggplot2::aes(fill = ggplot2::after_stat(value)),
   compute_group = function(data, scales, binwidth = 2.5, xlim = NULL, ylim = NULL) {
-    # A vertical rink applies scale_y_reverse(), so by now positions are in
-    # scale-transformed space. Bin in the original rink coords (inverse-transform
-    # in, transform the cell centres back out) so binning, and the xlim / ylim
-    # bounds, are the same in either orientation.
-    trx <- scale_transformation(scales$x)
-    try <- scale_transformation(scales$y)
-    cells <- bin_cells(trx$inverse(data$x), try$inverse(data$y), binwidth, xlim, ylim)
+    # A vertical rink applies scale_y_reverse(), so by here positions are in
+    # scale-TRANSFORMED space. Bin in the original rink coords (inverse-transform in,
+    # transform the cell centres back out) so the cells -- and the xlim/ylim bounds,
+    # given in rink coords -- are the same in either orientation.
+    trx <- .scale_transformation(scales$x)
+    try <- .scale_transformation(scales$y)
+    cells <- .bin_cells(trx$inverse(data$x), try$inverse(data$y), binwidth, xlim, ylim)
     z <- if ("z" %in% names(data)) data$z else rep(NA_real_, nrow(data))
     value <- as.numeric(tapply(z, cells$id, function(v) mean(v, na.rm = TRUE)))
-    value[is.nan(value)] <- NA_real_
+    value[is.nan(value)] <- NA_real_   # all-NA cell: NA (grey), not NaN
     data.frame(
       x = trx$transform(cells$xc),
       y = try$transform(cells$yc),
@@ -23,19 +33,20 @@ StatRinkBin <- ggplot2::ggproto("StatRinkBin", ggplot2::Stat,
   }
 )
 
-# The transformation of a position scale, or identity if there is none.
-scale_transformation <- function(sc) {
+# The transformation of a position scale, or identity if there is none. ggplot2 >= 3.5
+# has get_transformation(); older versions keep it in $trans.
+.scale_transformation <- function(sc) {
   identity <- list(transform = function(v) v, inverse = function(v) v)
   if (is.null(sc)) return(identity)
   tr <- if (!is.null(sc$get_transformation)) sc$get_transformation() else sc$trans
   if (is.null(tr)) identity else tr
 }
 
-# Assign points to square cells of side `binwidth`, anchored at 0. Values are
-# clamped into [lim[1], lim[2]) first, so points on or behind the boards fall
-# into the last in-rink cell instead of seeding one just outside.
-# Returns the cell centres (one per occupied cell) and each point's cell id.
-bin_cells <- function(x, y, binwidth, xlim = NULL, ylim = NULL) {
+# Assign points to square cells of side `binwidth`, anchored at 0. Values are clamped
+# into [lim[1], lim[2]) first, so events ON or behind the boards fall into the last
+# in-rink cell instead of seeding an extra cell just outside (most visible at small
+# binwidths). Returns the occupied cell centres and each point's cell id.
+.bin_cells <- function(x, y, binwidth, xlim = NULL, ylim = NULL) {
   clamp <- function(v, lim) {
     if (is.null(lim)) return(v)
     pmin(pmax(v, min(lim)), max(lim) - 1e-9)
@@ -48,10 +59,10 @@ bin_cells <- function(x, y, binwidth, xlim = NULL, ylim = NULL) {
   list(xc = xc[first], yc = yc[first], id = id)
 }
 
-# Legend key: a square whose side follows the mapped `size` (in rink units) as
-# a fraction of the key cell, so the legend shows squares growing with the
-# count.
-draw_key_rink_square <- function(data, params, size) {
+# Legend key: a square whose side follows the mapped `size` (in rink units) as a
+# fraction of the key cell, so the legend shows squares GROWING with the count. Falls
+# back to a full key for the constant-size styles.
+.draw_key_rink_square <- function(data, params, size) {
   bw <- params$binwidth
   if (is.null(bw) || !is.finite(bw)) bw <- 1
   s <- if (!is.null(data$size) && is.finite(data$size)) data$size else bw
@@ -68,25 +79,25 @@ draw_key_rink_square <- function(data, params, size) {
   )
 }
 
-# One square per cell, sized in rink units rather than page mm: `size` is the
-# square's side in rink coords, capped at `binwidth` so squares never overlap
-# and the map looks the same at any export size. Drawing is delegated to
-# GeomRect, which handles coord_flip() and coord_fixed().
+# One square per cell. `size` is read as the square's side in rink coords and capped
+# at `binwidth`. Drawing is delegated to GeomRect, which already handles coord_flip()
+# and coord_fixed().
 GeomRinkSquare <- ggplot2::ggproto("GeomRinkSquare", ggplot2::GeomRect,
   required_aes = c("x", "y"),
   default_aes = ggplot2::aes(
     fill = "grey50", colour = NA, linewidth = 0, linetype = 1,
     alpha = NA, size = 1
   ),
-  draw_key = draw_key_rink_square,
-  # binwidth must survive the layer's parameter check on the precomputed
-  # (identity stat) path too, where it isn't a stat parameter.
+  draw_key = .draw_key_rink_square,
+  # Declare binwidth so it survives the layer's param check on the precomputed
+  # (identity stat) path too, where it isn't a stat param -- the cap needs it.
   extra_params = c("na.rm", "binwidth"),
-  # The rect bounds depend on the scaled `size`, only known at draw time, so
-  # GeomRect's xmin/xmax requirement is met in draw_panel() instead.
+  # Pass data through unchanged: the rect bounds depend on the SCALED `size`, which
+  # isn't known until draw time, so GeomRect's xmin/xmax requirement is met in
+  # draw_panel() instead.
   setup_data = function(data, params) data,
   draw_panel = function(self, data, panel_params, coord, binwidth = 2.5, ...) {
-    s <- if (is.null(data$size)) binwidth else pmin(data$size, binwidth)
+    s <- if (is.null(data$size)) binwidth else pmin(data$size, binwidth)   # cap: no overlap, ever
     data$xmin <- data$x - s / 2
     data$xmax <- data$x + s / 2
     data$ymin <- data$y - s / 2
@@ -95,9 +106,9 @@ GeomRinkSquare <- ggplot2::ggproto("GeomRinkSquare", ggplot2::GeomRect,
   }
 )
 
-# Merge a layer's default mapping with the user's, keeping ggplot2's mapping
-# class (the user's entries win).
-merge_aes <- function(default, user) {
+# Merge a layer's default mapping with the user's, keeping ggplot2's mapping class
+# (the user's entries win).
+.merge_aes <- function(default, user) {
   if (is.null(user)) return(default)
   out <- utils::modifyList(default, user)
   class(out) <- class(default)
@@ -106,62 +117,59 @@ merge_aes <- function(default, user) {
 
 #' Binned heatmap of events on a rink
 #'
-#' Bins events into a square grid and draws one square per cell, coloured by
-#' the mean of the `z` aesthetic (e.g. expected goals, or any per-event value).
-#' Squares are drawn in **rink units** and never exceed `binwidth`, so they
-#' tile the grid without overlapping and look identical at any export size.
-#' Add it to a rink from [annotate_rink()]; facet it however you like.
+#' Bins events into a square grid and draws one square per cell, coloured by the mean
+#' of the `z` aesthetic (e.g. expected goals, or any per-event value). Squares are
+#' drawn in **rink units** and never exceed `binwidth`, so they tile the grid without
+#' overlapping and look identical at any export size. Add it to a rink from
+#' [annotate_rink()]; facet it however you like.
 #'
 #' Three ready-made styles cover the common maps; pick one with `style`:
 #' \describe{
-#'   \item{`"size"`}{Square **size** encodes the event count (area
-#'     proportional to frequency), **fill** the mean value.}
-#'   \item{`"fill"`}{Constant-size squares that fill the cell (leave a `gap`
-#'     for thin gridlines); **fill** encodes the mean value.}
-#'   \item{`"alpha"`}{Constant-size squares whose **alpha** encodes the event
-#'     count and **fill** the mean value.}
+#'   \item{`"size"`}{Square **size** encodes the event count (area proportional to
+#'     frequency), **fill** the mean value.}
+#'   \item{`"fill"`}{Constant-size squares that fill the cell (leave a `gap` for thin
+#'     gridlines); **fill** encodes the mean value.}
+#'   \item{`"alpha"`}{Constant-size squares whose **alpha** encodes the event count
+#'     and **fill** the mean value.}
 #' }
 #' Without a `z` aesthetic there is no value to average; map `fill` to
 #' `after_stat(count)` for a pure frequency map (see examples).
-#'
 #' @param mapping Aesthetic mapping, usually `aes(x, y, z)` (often set on the
-#'   `ggplot()` call), where `z` is averaged within each cell. `fill`, `size`
-#'   and `alpha` are supplied by `style`; anything you map here overrides
-#'   them. With `precomputed = TRUE`, the data needs `value` and `n` columns
-#'   (as returned by [rink_bin()]).
-#' @param data,position,na.rm,show.legend,inherit.aes Standard ggplot2 layer
-#'   arguments.
+#'   `ggplot()` call), where `z` is averaged within each cell. `fill`, `size` and
+#'   `alpha` are supplied by `style`; anything you map here overrides them. With
+#'   `precomputed = TRUE`, the data needs `value` and `n` columns (as returned by
+#'   [rink_bin()]).
+#' @param data,position,na.rm,show.legend,inherit.aes Standard ggplot2 layer arguments.
 #' @param ... Other arguments passed to [ggplot2::layer()].
 #' @param style One of `"size"`, `"fill"` or `"alpha"` (see Details).
 #' @param binwidth Cell size, in rink units. Also the largest square side.
-#' @param gap For `"fill"` and `"alpha"`, the gap between squares in rink units
-#'   (the square side is `binwidth - gap`).
+#' @param gap For `"fill"` and `"alpha"`, the gap between squares in rink units (the
+#'   square side is `binwidth - gap`).
 #' @param alpha Constant square alpha for `"size"` and `"fill"` (default `0.9`).
 #'   Ignored for `"alpha"`, where alpha is mapped.
-#' @param dimensions Rink dimensions (e.g. [IIHF], [NHL]) that set the binning
-#'   bounds, so events on or behind the boards snap into the last in-rink cell.
-#'   Pass the rink you are drawing, or `NULL` to bin without bounds. Ignored
-#'   for any of `xlim` / `ylim` given, and when `precomputed = TRUE`.
+#' @param dimensions Rink dimensions (e.g. [IIHF], [NHL]) that set the binning bounds,
+#'   so events on or behind the boards snap into the last in-rink cell. Pass the rink
+#'   you are drawing, or `NULL` to bin without bounds. Ignored for any of `xlim` /
+#'   `ylim` given, and when `precomputed = TRUE`.
 #' @param xlim,ylim Optional binning bounds in rink coordinates.
-#' @param precomputed If `TRUE`, skip binning and draw the cells as supplied,
-#'   e.g. values you derived yourself from [rink_bin()].
-#' @param scales If `TRUE` (default), also return the matching scales for
-#'   `style`: [scale_fill_rink()] (or [scale_fill_rink_diverging()] with
-#'   `diverging = TRUE`) plus [scale_size_rink()] for `"size"` or
-#'   [scale_alpha_rink()] for `"alpha"`. Set `FALSE` to add your own.
-#' @param diverging Use the diverging fill scale, for maps of differences
-#'   centred on 0 (e.g. a player minus league average).
-#' @param colour,linewidth Square border colour and width. The default draws
-#'   no border; use e.g. `colour = "white", linewidth = 0.3` for gridlines.
-#'
+#' @param precomputed If `TRUE`, skip binning and draw the cells as supplied, e.g.
+#'   values you derived yourself from [rink_bin()].
+#' @param scales If `TRUE` (default), also return the matching scales for `style`:
+#'   [scale_fill_rink()] (or [scale_fill_rink_diverging()] with `diverging = TRUE`)
+#'   plus [scale_size_rink()] for `"size"` or [scale_alpha_rink()] for `"alpha"`. Set
+#'   `FALSE` to add your own.
+#' @param diverging Use the diverging fill scale, for maps of differences centred on 0
+#'   (e.g. a player minus league average).
+#' @param colour,linewidth Square border colour and width. The default draws no
+#'   border; use e.g. `colour = "white", linewidth = 0.3` for gridlines.
 #' @return A ggplot2 layer, or a list of a layer and scales.
 #' @seealso [rink_bin()], [scale_fill_rink()], [annotate_rink()]
+#' @keywords plot, heatmap
 #' @examples
 #' library(ggplot2)
 #'
 #' base <- ggplot(shots, aes(x, y, z = xg)) +
-#'   annotate_rink(orientation = "vertical", zones = "oz",
-#'                 colour = "grey60", linewidth = 0.5)
+#'   annotate_rink(orientation = "vertical", zones = "oz", colour = "grey60")
 #'
 #' base + geom_rink_bin(style = "size", binwidth = 2)
 #' base + geom_rink_bin(style = "fill", binwidth = 2, gap = 0.1)
@@ -180,11 +188,11 @@ geom_rink_bin <- function(mapping = NULL, data = NULL, position = "identity", ..
                           precomputed = FALSE, scales = TRUE, diverging = FALSE,
                           colour = NA, linewidth = 0,
                           na.rm = FALSE, show.legend = NA, inherit.aes = TRUE) {
-  style <- rlang::arg_match(style)
-  stopifnot(is_number(binwidth), binwidth > 0, is_number(gap), gap >= 0, gap < binwidth)
+  style <- match.arg(style)
+  stopifnot(.is_number(binwidth), binwidth > 0, .is_number(gap), gap >= 0, gap < binwidth)
 
-  # Under the binning stat the value and count come from the stat; when
-  # precomputed they are plain columns (value, n).
+  # Style default mappings. Under the binning stat value/count come from the stat
+  # (after_stat); when precomputed they are plain columns (value, n).
   if (precomputed) {
     fill_map  <- ggplot2::aes(fill = .data$value)
     size_map  <- ggplot2::aes(size = .data$n)
@@ -195,24 +203,27 @@ geom_rink_bin <- function(mapping = NULL, data = NULL, position = "identity", ..
     alpha_map <- ggplot2::aes(alpha = ggplot2::after_stat(count))
   }
   default_map <- switch(style,
-    size  = merge_aes(fill_map, size_map),
+    size  = .merge_aes(fill_map, size_map),
     fill  = fill_map,
-    alpha = merge_aes(fill_map, alpha_map)
+    alpha = .merge_aes(fill_map, alpha_map)
   )
-  mapping <- merge_aes(default_map, mapping)
+  mapping <- .merge_aes(default_map, mapping)
 
   params <- list(na.rm = na.rm, colour = colour, linewidth = linewidth,
                  binwidth = binwidth, ...)
+  # Binning bounds default from `dimensions`; an explicit xlim/ylim wins, and
+  # `dimensions = NULL` opts out entirely.
   if (!precomputed) {
     if (!is.null(dimensions)) {
-      check_dimensions(dimensions)
+      .check_dimensions(dimensions)
       if (is.null(xlim)) xlim <- dimensions$origin_x + c(0, dimensions$length)
       if (is.null(ylim)) ylim <- dimensions$origin_y + c(0, dimensions$width)
     }
     params$xlim <- xlim
     params$ylim <- ylim
   }
-  # Constant-size styles set the side directly, bypassing any size scale.
+  # Constant-size styles set the side directly (bypassing any size scale); the
+  # constant-alpha styles take the (adjustable) alpha as a fixed value.
   if (style %in% c("fill", "alpha")) params$size <- binwidth - gap
   if (style %in% c("size", "fill")) {
     params$alpha <- if (is.null(alpha)) 0.9 else alpha
@@ -227,6 +238,9 @@ geom_rink_bin <- function(mapping = NULL, data = NULL, position = "identity", ..
   )
   if (!isTRUE(scales)) return(lyr)
 
+  # Auto-attach the matched scales so each style is fully styled out of the box. Adding
+  # your own scale_*_rink() on top triggers ggplot2's harmless "scale already present"
+  # message; scales = FALSE avoids it.
   scale_list <- list(if (diverging) scale_fill_rink_diverging() else scale_fill_rink())
   if (style == "size")  scale_list <- c(scale_list, list(scale_size_rink(binwidth = binwidth)))
   if (style == "alpha") scale_list <- c(scale_list, list(scale_alpha_rink()))
@@ -235,23 +249,22 @@ geom_rink_bin <- function(mapping = NULL, data = NULL, position = "identity", ..
 
 #' Bin events into a rink grid
 #'
-#' Aggregates events into the square grid that [geom_rink_bin()] draws: one row
-#' per occupied cell (per group) with the event count and the mean value. Use
-#' it to derive your own cell values (differences between teams, shrinkage,
-#' rates per 60, ...) and plot them with `geom_rink_bin(precomputed = TRUE)`.
-#'
+#' Aggregates events into the square grid that [geom_rink_bin()] draws: one row per
+#' occupied cell (per group) with the event count and the mean value. Use it to derive
+#' your own cell values (differences between teams, shrinkage, rates per 60, ...) and
+#' plot them with `geom_rink_bin(precomputed = TRUE)`.
 #' @param data A data frame of events.
 #' @param x,y Coordinate columns (unquoted).
-#' @param value Column to average within each cell (unquoted). Omit for counts
-#'   only (`value` is then `NA`).
+#' @param value Column to average within each cell (unquoted). Omit for counts only
+#'   (`value` is then `NA`).
 #' @param binwidth Cell size, in rink units.
 #' @param by Columns to group by in addition to the cell, e.g. `team` or
 #'   `c(team, period)` (unquoted, tidyselect).
 #' @param dimensions,xlim,ylim Binning bounds, as in [geom_rink_bin()].
-#'
 #' @return A tibble with the `by` columns, `x` and `y` (cell centres), `n` (event
 #'   count) and `value` (mean of `value`, ignoring `NA`s).
 #' @seealso [geom_rink_bin()]
+#' @keywords heatmap
 #' @examples
 #' cells <- rink_bin(shots, x, y, value = xg, binwidth = 2, by = team)
 #' head(cells)
@@ -269,9 +282,9 @@ geom_rink_bin <- function(mapping = NULL, data = NULL, position = "identity", ..
 #' @export
 rink_bin <- function(data, x, y, value = NULL, binwidth = 2.5, by = NULL,
                      dimensions = IIHF, xlim = NULL, ylim = NULL) {
-  stopifnot(is.data.frame(data), is_number(binwidth), binwidth > 0)
+  stopifnot(is.data.frame(data), .is_number(binwidth), binwidth > 0)
   if (!is.null(dimensions)) {
-    check_dimensions(dimensions)
+    .check_dimensions(dimensions)
     if (is.null(xlim)) xlim <- dimensions$origin_x + c(0, dimensions$length)
     if (is.null(ylim)) ylim <- dimensions$origin_y + c(0, dimensions$width)
   }
@@ -280,8 +293,9 @@ rink_bin <- function(data, x, y, value = NULL, binwidth = 2.5, by = NULL,
 
   xv <- rlang::eval_tidy(rlang::enquo(x), data)
   yv <- rlang::eval_tidy(rlang::enquo(y), data)
-  if (!is.numeric(xv) || !is.numeric(yv)) rlang::abort("`x` and `y` must be numeric columns.")
-  cells <- bin_cells(xv, yv, binwidth, xlim, ylim)
+  if (!is.numeric(xv) || !is.numeric(yv))
+    stop("`x` and `y` must be numeric columns", call. = FALSE)
+  cells <- .bin_cells(xv, yv, binwidth, xlim, ylim)   # same cells as the stat
 
   data$.x <- cells$xc[cells$id]
   data$.y <- cells$yc[cells$id]

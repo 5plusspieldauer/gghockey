@@ -21,8 +21,8 @@ rink_bin(
 
 \item{x, y}{Coordinate columns (unquoted).}
 
-\item{value}{Column to average within each cell (unquoted). Omit for counts
-only (\code{value} is then \code{NA}).}
+\item{value}{Column to average within each cell (unquoted). Omit for counts only
+(\code{value} is then \code{NA}).}
 
 \item{binwidth}{Cell size, in rink units.}
 
@@ -36,10 +36,10 @@ A tibble with the \code{by} columns, \code{x} and \code{y} (cell centres), \code
 count) and \code{value} (mean of \code{value}, ignoring \code{NA}s).
 }
 \description{
-Aggregates events into the square grid that \code{\link[=geom_rink_bin]{geom_rink_bin()}} draws: one row
-per occupied cell (per group) with the event count and the mean value. Use
-it to derive your own cell values (differences between teams, shrinkage,
-rates per 60, ...) and plot them with \code{geom_rink_bin(precomputed = TRUE)}.
+Aggregates events into the square grid that \code{\link[=geom_rink_bin]{geom_rink_bin()}} draws: one row per
+occupied cell (per group) with the event count and the mean value. Use it to derive
+your own cell values (differences between teams, shrinkage, rates per 60, ...) and
+plot them with \code{geom_rink_bin(precomputed = TRUE)}.
 }
 \examples{
 cells <- rink_bin(shots, x, y, value = xg, binwidth = 2, by = team)
@@ -59,3 +59,4 @@ ggplot(wide, aes(x, y)) +
 \seealso{
 \code{\link[=geom_rink_bin]{geom_rink_bin()}}
 }
+\keyword{heatmap}

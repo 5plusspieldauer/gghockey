@@ -1,3 +1,7 @@
+# annotate_rink() contract: layers + coord + theme come back, zones set the right x
+# limits, a vertical rink is a REAL rotation (high-x end on top, correct aspect ratio),
+# and logos load from files or arrays and fail loudly on bad input. Fixtures only.
+
 has_class <- function(x, cls) any(vapply(x, inherits, logical(1), cls))
 
 test_that("annotate_rink() returns layers, a coord and a theme", {
@@ -79,8 +83,8 @@ test_that("logos are placed from files or arrays, and validated", {
 
 test_that("logo alpha is applied to the image", {
   img <- array(1, c(2, 2, 4))
-  m <- gghockey:::logo_raster(img, alpha = 0.25, pos = "centre")
+  m <- gghockey:::.logo_raster(img, alpha = 0.25, pos = "centre")
   expect_equal(unique(as.vector(m)), grDevices::rgb(1, 1, 1, 0.25))
-  rgb_only <- gghockey:::logo_raster(array(0, c(2, 2, 3)), alpha = 0.5, pos = "centre")
+  rgb_only <- gghockey:::.logo_raster(array(0, c(2, 2, 3)), alpha = 0.5, pos = "centre")
   expect_equal(unique(as.vector(rgb_only)), grDevices::rgb(0, 0, 0, 0.5))
 })

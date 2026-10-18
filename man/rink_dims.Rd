@@ -8,14 +8,14 @@
 \title{Rink dimensions}
 \format{
 A named list. Geometry fields are in metres: \code{length}, \code{width},
-\code{blue_line} and \code{end_line} (distance from the end boards), \code{faceoff_dot_x}
-/ \code{faceoff_dot_y} (end-zone dot offsets from the corner), \code{nz_faceoff_dot}
-(neutral-zone dot offset from the blue line), \code{faceoff_circle} (radius),
-the hash-mark, crease and goal measures, and \code{corner_border_start_x} /
+\code{blue_line} and \code{end_line} (distance from the end boards), \code{faceoff_dot_x} /
+\code{faceoff_dot_y} (end-zone dot offsets from the corner), \code{nz_faceoff_dot}
+(neutral-zone dot offset from the blue line), \code{faceoff_circle} (radius), the
+hash-mark, crease and goal measures, and \code{corner_border_start_x} /
 \code{corner_border_start_y} (corner radii). \code{origin_x} / \code{origin_y} place the
-corner of the boards in data coordinates, \code{lines_small} / \code{lines_big} are
-the ggplot2 line widths for thin and thick markings, and \code{type} is \code{"IIHF"}
-or \code{"NHL"}.
+corner of the boards in data coordinates, \code{lines_small} / \code{lines_big} are the
+ggplot2 line widths for thin and thick markings, and \code{type} is \code{"IIHF"} or
+\code{"NHL"}.
 
 An object of class \code{list} of length 31.
 
@@ -28,18 +28,10 @@ NHL
 }
 \description{
 Named lists describing a rink's markings, in metres, with the origin at the
-bottom-left corner of the boards: \code{x} runs along the length of the rink
-(left end boards to right end boards) and \code{y} across its width. Every drawing
-and binning function in gghockey takes one of these as \code{dimensions}.
-}
-\details{
-\itemize{
-\item \code{IIHF}: the standard 60 x 30 m international rink.
-\item \code{NHL}: the 200 x 85 ft North American rink, converted to metres.
-}
-
-Use \code{\link[=rink_dimensions]{rink_dimensions()}} to derive a variant (a narrower rink, a shifted
-origin to match your data's coordinate frame, thicker lines, ...).
+bottom-left corner of the boards: \code{x} runs along the length of the rink (left
+end boards to right end boards) and \code{y} across its width. \code{IIHF} is the
+standard 60 x 30 m international rink, \code{NHL} the 200 x 85 ft North American
+rink converted to metres. Use \code{\link[=rink_dimensions]{rink_dimensions()}} to derive a variant.
 }
 \examples{
 IIHF$length
@@ -49,3 +41,5 @@ NHL$length
 \code{\link[=rink_dimensions]{rink_dimensions()}}, \code{\link[=annotate_rink]{annotate_rink()}}, \code{\link[=rink_geometry]{rink_geometry()}}
 }
 \keyword{datasets}
+\keyword{dimensions}
+\keyword{rink,}

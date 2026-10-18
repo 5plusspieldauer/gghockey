@@ -14,13 +14,13 @@ annotate_rink(
   ylim = NULL,
   margin = 0.5,
   zone_margin = 2,
-  linewidth = 1,
+  linewidth = 0.3,
   details = FALSE,
   slot = FALSE,
   slot_colour = "grey",
   slot_fill = NA,
   slot_alpha = 0.7,
-  slot_linewidth = 1.25,
+  slot_linewidth = 0.4,
   logos = NULL,
   logo_alpha = 0.25,
   theme = TRUE
@@ -31,28 +31,29 @@ annotate_rink(
 
 \item{fill}{Colour of the ice.}
 
-\item{dimensions}{Rink dimensions to draw, e.g. \link{IIHF} (default) or \link{NHL};
-see \link{rink_dims} and \code{\link[=rink_dimensions]{rink_dimensions()}}.}
+\item{dimensions}{Rink dimensions to draw, e.g. \link{IIHF} (default) or \link{NHL}; see
+\link{rink_dims} and \code{\link[=rink_dimensions]{rink_dimensions()}}.}
 
-\item{orientation}{\code{"horizontal"} (default) or \code{"vertical"} (the right-hand
-end, the offensive zone, at the top).}
+\item{orientation}{\code{"horizontal"} (default) or \code{"vertical"} (the right-hand end, the
+offensive zone, at the top).}
 
-\item{zones}{Which zones to show, a subset of \code{c("dz", "nz", "oz")} (default
-all three); \code{"oz"} is the high-\code{x} end. Sets \code{xlim} for you, e.g.
-\code{c("dz", "nz")} crops to the defensive and neutral zones. Ignored if \code{xlim}
-is given.}
+\item{zones}{Which zones to show, a subset of \code{c("dz", "nz", "oz")} (default all
+three); \code{"oz"} is the high-\code{x} end. Sets \code{xlim} for you, e.g. \code{c("dz", "nz")} crops
+to the defensive and neutral zones. Ignored if \code{xlim} is given.}
 
-\item{xlim, ylim}{Optional plot limits in rink coordinates, to crop by hand.
-\code{xlim} overrides \code{zones}; \code{ylim} defaults to the full width plus \code{margin}.}
+\item{xlim, ylim}{Optional plot limits in rink coordinates, to crop by hand. \code{xlim}
+overrides \code{zones}; \code{ylim} defaults to the full width plus \code{margin}.}
 
 \item{margin}{Space (in rink units) added beyond the end and side boards.}
 
-\item{zone_margin}{Space added beyond a blue line when \code{zones} stops there,
-so the crop runs a little past the line instead of ending on it.}
+\item{zone_margin}{Space added beyond a blue line when \code{zones} stops there, so the
+crop runs a little past the line instead of ending on it.}
 
-\item{linewidth}{Multiplier for the rink line widths. ggplot2 line widths are
-absolute (mm on the page), so reduce this for small or heavily faceted
-rinks.}
+\item{linewidth}{Multiplier for the rink line widths (\code{lines_small} / \code{lines_big} in
+\code{dimensions}). ggplot2 line widths are absolute (mm on the page), so they don't
+shrink with the plot: the default \code{0.3} suits a rink a few inches across; go lower
+(e.g. \code{0.2}) for small or heavily faceted rinks and higher (e.g. \code{0.6}-\code{1}) for a
+large poster-size rink.}
 
 \item{details}{If \code{TRUE}, draw the faceoff hash marks and the dot cut-outs.}
 
@@ -61,29 +62,28 @@ rinks.}
 \item{slot_colour, slot_fill, slot_alpha, slot_linewidth}{Slot styling.}
 
 \item{logos}{Optional logos to place on the ice, as a named list with any of
-\code{centre}, \code{left} and \code{right} (centre ice, and just inside each blue line).
-Each entry is a path to a PNG file or an image already in memory (an
-array as returned by \code{\link[png:readPNG]{png::readPNG()}}, a matrix of colours or a \code{raster}).
-Reading PNG files needs the \pkg{png} package. No logos ship with
-gghockey: bring the ones you have the rights to use.}
+\code{centre}, \code{left} and \code{right} (centre ice, and just inside each blue line). Each
+entry is a path to a PNG file or an image already in memory (an array as returned
+by \code{\link[png:readPNG]{png::readPNG()}}, a matrix of colours or a \code{raster}). Reading PNG files needs the
+\pkg{png} package. No logos ship with gghockey: bring the ones you have the rights
+to use.}
 
 \item{logo_alpha}{Opacity of the logos, between 0 and 1.}
 
-\item{theme}{If \code{TRUE} (default), add \code{\link[=theme_rink]{theme_rink()}} (and, for vertical
-rinks, the matching aspect ratio). Set \code{FALSE} to supply your own theme.}
+\item{theme}{If \code{TRUE} (default), add \code{\link[=theme_rink]{theme_rink()}} (and, for vertical rinks, the
+matching aspect ratio). Set \code{FALSE} to supply your own theme.}
 }
 \value{
 A list of ggplot2 components (rink layers, a coordinate system and,
 optionally, a theme) to add to a plot.
 }
 \description{
-Draws the rink markings and sets up the plot canvas in one call: the rink
-layers, a coordinate system for the chosen orientation and, unless
-\code{theme = FALSE}, \code{\link[=theme_rink]{theme_rink()}}. Add it right after \code{ggplot()}, before your
-geoms, and map your data with regular horizontal rink coordinates (\code{x} along
-the length, \code{y} across the width, in the frame of \code{dimensions}). For
-\code{orientation = "vertical"} the display is rotated for you, so the same data
-works in either orientation.
+Draws the rink markings and sets up the plot canvas in one call: the rink layers, a
+coordinate system for the chosen orientation and, unless \code{theme = FALSE},
+\code{\link[=theme_rink]{theme_rink()}}. Add it right after \code{ggplot()}, before your geoms, and map your data
+in regular horizontal rink coordinates (\code{x} along the length, \code{y} across the width,
+in the frame of \code{dimensions}). For \code{orientation = "vertical"} the display is rotated
+for you, so the same data works in either orientation.
 }
 \examples{
 library(ggplot2)
@@ -102,6 +102,8 @@ ggplot() +
   annotate_rink(dimensions = NHL, colour = "grey30", fill = "white")
 }
 \seealso{
-\code{\link[=rink_geometry]{rink_geometry()}} for the markings as data, \code{\link[=geom_rink_bin]{geom_rink_bin()}} for
-heatmaps on the rink.
+\code{\link[=rink_geometry]{rink_geometry()}} for the markings as data, \code{\link[=geom_rink_bin]{geom_rink_bin()}} for heatmaps
+on the rink.
 }
+\keyword{plot}
+\keyword{rink,}

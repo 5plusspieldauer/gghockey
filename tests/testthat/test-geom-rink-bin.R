@@ -1,3 +1,7 @@
+# Binning contract: rink_bin() and the stat produce the SAME cells (in both
+# orientations), board-edge events snap into the last in-rink cell, all-NA cells give
+# NA (not NaN), and squares never exceed one cell. Uses the simulated shots data.
+
 pts <- data.frame(
   x = c(0.1, 0.4, 1.2, 1.9, 59.99, 60, 61),
   y = c(0.1, 0.2, 0.3, 1.5, 15, 15, 15),

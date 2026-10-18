@@ -9,11 +9,11 @@ rink_geometry(dimensions = IIHF, details = FALSE, slot = FALSE)
 \arguments{
 \item{dimensions}{Rink dimensions, e.g. \link{IIHF} or \link{NHL} (see \link{rink_dims}).}
 
-\item{details}{If \code{TRUE}, include the faceoff-circle hash marks and the
-cut-outs inside the faceoff dots.}
+\item{details}{If \code{TRUE}, include the faceoff-circle hash marks and the cut-outs
+inside the faceoff dots.}
 
-\item{slot}{If \code{TRUE}, include the offensive-zone slot (the high-danger area
-in front of the right-hand goal).}
+\item{slot}{If \code{TRUE}, include the offensive-zone slot (the high-danger area in
+front of the right-hand goal).}
 }
 \value{
 A data frame with columns:
@@ -22,26 +22,19 @@ A data frame with columns:
 \item{\code{group}}{Integer id, unique per shape, in drawing order.}
 \item{\code{kind}}{\code{"polygon"} (closed) or \code{"path"} (open line).}
 \item{\code{x}, \code{y}}{Vertex coordinates, in the frame of \code{dimensions}.}
-\item{\code{colour}, \code{fill}}{Style roles: \code{"line"} (the marking colour),
-\code{"ice"} (the rink fill colour), \code{"slot"} (the slot styling) or \code{NA}
-(none).}
-\item{\code{linewidth}}{\code{"small"}, \code{"big"}, \code{"slot"} or \code{NA} (the ggplot2
-default).}
-\item{\code{alpha}}{Fill alpha (\code{NA} for the slot, which takes
-\code{slot_alpha} in \code{\link[=annotate_rink]{annotate_rink()}}).}
+\item{\code{colour}, \code{fill}}{Style roles: \code{"line"} (the marking colour), \code{"ice"}
+(the rink fill colour), \code{"slot"} (the slot styling) or \code{NA} (none).}
+\item{\code{linewidth}}{\code{"small"}, \code{"big"}, \code{"slot"} or \code{NA} (the ggplot2 default).}
+\item{\code{alpha}}{Fill alpha (\code{NA} for the slot, which takes \code{slot_alpha} in
+\code{\link[=annotate_rink]{annotate_rink()}}).}
 \item{\code{linejoin}}{Line-join style for the outline.}
 }
 }
 \description{
-Returns every rink marking as tidy coordinates: one row per vertex, grouped
-by \code{shape}. This is what \code{\link[=annotate_rink]{annotate_rink()}} draws, exposed so you can reuse
-the geometry elsewhere (another plotting library, an interactive map, a
-point-in-zone test, ...).
-}
-\details{
-Markings are listed in drawing order (bottom to top). Shapes on the right
-half of the rink are mirror images of the left half, built from the same
-code.
+Returns every rink marking as tidy coordinates: one row per vertex, grouped by
+\code{shape}. This is what \code{\link[=annotate_rink]{annotate_rink()}} draws, exposed so you can reuse the
+geometry elsewhere (another plotting library, an interactive map, a point-in-zone
+test, ...). Markings are listed in drawing order (bottom to top).
 }
 \examples{
 geo <- rink_geometry(IIHF)
@@ -56,3 +49,5 @@ ggplot(geo[geo$kind == "path", ], aes(x, y, group = group)) +
 \seealso{
 \code{\link[=annotate_rink]{annotate_rink()}}
 }
+\keyword{geometry}
+\keyword{rink,}
