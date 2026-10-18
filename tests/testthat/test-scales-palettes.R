@@ -20,7 +20,7 @@ test_that("the diverging scale is symmetric around zero", {
 test_that("size scale range is in rink units", {
   s <- scale_size_rink(binwidth = 2, frac = c(0.5, 1))
   expect_equal(s$palette(c(0, 1)), c(1, 2))
-  expect_error(scale_size_rink(frac = c(0.5, 1.5)))
+  expect_error(scale_size_rink(frac = c(0.5, 1.5)), "`frac` must be two numbers")
 })
 
 test_that("team_palette() builds and validates palettes", {

@@ -18,15 +18,15 @@ StatRinkBin <- ggplot2::ggproto("StatRinkBin", ggplot2::Stat,
     # scale-TRANSFORMED space. Bin in the original rink coords (inverse-transform in,
     # transform the cell centres back out) so the cells -- and the xlim/ylim bounds,
     # given in rink coords -- are the same in either orientation.
-    trx <- .scale_transformation(scales$x)
-    try <- .scale_transformation(scales$y)
-    cells <- .bin_cells(trx$inverse(data$x), try$inverse(data$y), binwidth, xlim, ylim)
+    tr_x <- .scale_transformation(scales$x)
+    tr_y <- .scale_transformation(scales$y)
+    cells <- .bin_cells(tr_x$inverse(data$x), tr_y$inverse(data$y), binwidth, xlim, ylim)
     z <- if ("z" %in% names(data)) data$z else rep(NA_real_, nrow(data))
     value <- as.numeric(tapply(z, cells$id, function(v) mean(v, na.rm = TRUE)))
     value[is.nan(value)] <- NA_real_   # all-NA cell: NA (grey), not NaN
     data.frame(
-      x = trx$transform(cells$xc),
-      y = try$transform(cells$yc),
+      x = tr_x$transform(cells$xc),
+      y = tr_y$transform(cells$yc),
       value = value,
       count = as.numeric(tabulate(cells$id, nbins = length(cells$xc)))
     )
@@ -189,7 +189,9 @@ geom_rink_bin <- function(mapping = NULL, data = NULL, position = "identity", ..
                           colour = NA, linewidth = 0,
                           na.rm = FALSE, show.legend = NA, inherit.aes = TRUE) {
   style <- match.arg(style)
-  stopifnot(.is_number(binwidth), binwidth > 0, .is_number(gap), gap >= 0, gap < binwidth)
+  .check_number(binwidth, "binwidth", binwidth > 0, "a positive number")
+  .check_number(gap, "gap", gap >= 0 && gap < binwidth,
+                sprintf("a number from 0 up to (not incl.) binwidth = %s", binwidth))
 
   # Style default mappings. Under the binning stat value/count come from the stat
   # (after_stat); when precomputed they are plain columns (value, n).
@@ -282,7 +284,8 @@ geom_rink_bin <- function(mapping = NULL, data = NULL, position = "identity", ..
 #' @export
 rink_bin <- function(data, x, y, value = NULL, binwidth = 2.5, by = NULL,
                      dimensions = IIHF, xlim = NULL, ylim = NULL) {
-  stopifnot(is.data.frame(data), .is_number(binwidth), binwidth > 0)
+  if (!is.data.frame(data)) stop("`data` must be a data frame", call. = FALSE)
+  .check_number(binwidth, "binwidth", binwidth > 0, "a positive number")
   if (!is.null(dimensions)) {
     .check_dimensions(dimensions)
     if (is.null(xlim)) xlim <- dimensions$origin_x + c(0, dimensions$length)

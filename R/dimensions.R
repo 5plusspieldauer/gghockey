@@ -148,6 +148,17 @@ rink_dimensions <- function(base = IIHF, ...) {
 
 .is_number <- function(x) is.numeric(x) && length(x) == 1 && is.finite(x)
 
+# Readable argument checks in place of stopifnot() (whose "x > 0 is not TRUE" doesn't
+# say which argument or what's allowed). `ok` is only evaluated once `x` is known to
+# be a number, so a range test like `x > 0` never runs on NULL / a string.
+.check_number <- function(x, arg, ok = TRUE, what = "a single finite number") {
+  if (!.is_number(x) || !isTRUE(ok))
+    stop(sprintf("`%s` must be %s, got: %s", arg, what,
+                 if (is.null(x)) "NULL" else paste(utils::head(format(x), 3), collapse = ", ")),
+         call. = FALSE)
+  invisible(x)
+}
+
 # Fail EARLY, with a readable message, on anything that isn't a full set of rink
 # dimensions or whose markings can't fit on the rink -- otherwise the error surfaces
 # deep inside a ggplot build as a cryptic NA / polygon complaint.

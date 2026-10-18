@@ -88,3 +88,12 @@ test_that("logo alpha is applied to the image", {
   rgb_only <- gghockey:::.logo_raster(array(0, c(2, 2, 3)), alpha = 0.5, pos = "centre")
   expect_equal(unique(as.vector(rgb_only)), grDevices::rgb(0, 0, 0, 0.5))
 })
+
+test_that("bad arguments fail with messages that name the argument", {
+  expect_error(annotate_rink(linewidth = 0), "`linewidth` must be a positive number, got: 0")
+  expect_error(annotate_rink(linewidth = NULL), "`linewidth` must be a positive number, got: NULL")
+  expect_error(annotate_rink(logo_alpha = 2), "`logo_alpha` must be a number between 0 and 1")
+  expect_error(annotate_rink(xlim = 40), "`xlim` must be two numbers")
+  expect_error(geom_rink_bin(binwidth = -1), "`binwidth` must be a positive number")
+  expect_error(rink_bin(list(x = 1, y = 1), x, y), "`data` must be a data frame")
+})

@@ -79,7 +79,7 @@ test_that("each style attaches its matching scales", {
   expect_setequal(scale_aes(geom_rink_bin(style = "fill")), "fill")
   expect_s3_class(geom_rink_bin(scales = FALSE), "LayerInstance")
   expect_error(geom_rink_bin(style = "hex"))
-  expect_error(geom_rink_bin(binwidth = 2, gap = 2))
+  expect_error(geom_rink_bin(binwidth = 2, gap = 2), "`gap` must be a number from 0 up to")
 })
 
 test_that("precomputed cells draw as supplied", {

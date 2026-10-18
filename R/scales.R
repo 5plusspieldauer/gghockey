@@ -91,7 +91,8 @@ scale_fill_rink_diverging <- function(name = "Difference", palette = "Blue-Red 3
 scale_size_rink <- function(name = "Count", binwidth = 2.5, frac = c(0.4, 1),
                             square_colour = "#143F84", ...) {
   # frac <= 1: the biggest square is one full cell, so squares can never overlap.
-  stopifnot(is.numeric(frac), length(frac) == 2, all(frac > 0), all(frac <= 1))
+  if (!is.numeric(frac) || length(frac) != 2 || anyNA(frac) || any(frac <= 0) || any(frac > 1))
+    stop("`frac` must be two numbers in (0, 1], e.g. c(0.4, 1)", call. = FALSE)
   ggplot2::scale_size(
     name = name, range = frac * binwidth,
     guide = ggplot2::guide_legend(

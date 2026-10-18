@@ -88,8 +88,9 @@ annotate_rink <- function(colour = "#143F84",
                           theme = TRUE) {
   .check_dimensions(dimensions)
   orientation <- match.arg(orientation)
-  stopifnot(.is_number(linewidth), linewidth > 0,
-            .is_number(logo_alpha), logo_alpha >= 0, logo_alpha <= 1)
+  .check_number(linewidth, "linewidth", linewidth > 0, "a positive number")
+  .check_number(logo_alpha, "logo_alpha", logo_alpha >= 0 && logo_alpha <= 1,
+                "a number between 0 and 1")
 
   # Resolve the geometry's style ROLES into actual colours / widths.
   geo <- rink_geometry(dimensions, details = details, slot = slot)
@@ -190,6 +191,9 @@ annotate_rink <- function(colour = "#143F84",
               hi + if (isTRUE(all.equal(hi, right_end))) margin else zone_margin)
   }
   if (is.null(ylim)) ylim <- c(d$origin_y - margin, d$origin_y + d$width + margin)
-  stopifnot(is.numeric(xlim), length(xlim) == 2, is.numeric(ylim), length(ylim) == 2)
+  for (lim in list(list(xlim, "xlim"), list(ylim, "ylim"))) {
+    if (!is.numeric(lim[[1]]) || length(lim[[1]]) != 2 || anyNA(lim[[1]]))
+      stop(sprintf("`%s` must be two numbers, e.g. c(37.5, 60.5)", lim[[2]]), call. = FALSE)
+  }
   list(x = sort(xlim), y = sort(ylim))
 }
