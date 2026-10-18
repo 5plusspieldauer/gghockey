@@ -6,7 +6,7 @@ rink layers, a coordinate system for the chosen orientation and, unless
 [`theme_rink()`](https://5plusspieldauer.github.io/gghockey/reference/theme_rink.md).
 Add it right after
 [`ggplot()`](https://ggplot2.tidyverse.org/reference/ggplot.html),
-before your geoms, and map your data with regular horizontal rink
+before your geoms, and map your data in regular horizontal rink
 coordinates (`x` along the length, `y` across the width, in the frame of
 `dimensions`). For `orientation = "vertical"` the display is rotated for
 you, so the same data works in either orientation.
@@ -24,13 +24,13 @@ annotate_rink(
   ylim = NULL,
   margin = 0.5,
   zone_margin = 2,
-  linewidth = 1,
+  linewidth = 0.3,
   details = FALSE,
   slot = FALSE,
   slot_colour = "grey",
   slot_fill = NA,
   slot_alpha = 0.7,
-  slot_linewidth = 1.25,
+  slot_linewidth = 0.4,
   logos = NULL,
   logo_alpha = 0.25,
   theme = TRUE
@@ -86,8 +86,11 @@ annotate_rink(
 
 - linewidth:
 
-  Multiplier for the rink line widths. ggplot2 line widths are absolute
-  (mm on the page), so reduce this for small or heavily faceted rinks.
+  Multiplier for the rink line widths (`lines_small` / `lines_big` in
+  `dimensions`). ggplot2 line widths are absolute (mm on the page), so
+  they don't shrink with the plot: the default `0.3` suits a rink a few
+  inches across; go lower (e.g. `0.2`) for small or heavily faceted
+  rinks and higher (e.g. `0.6`-`1`) for a large poster-size rink.
 
 - details:
 

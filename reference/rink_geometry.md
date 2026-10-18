@@ -4,7 +4,8 @@ Returns every rink marking as tidy coordinates: one row per vertex,
 grouped by `shape`. This is what
 [`annotate_rink()`](https://5plusspieldauer.github.io/gghockey/reference/annotate_rink.md)
 draws, exposed so you can reuse the geometry elsewhere (another plotting
-library, an interactive map, a point-in-zone test, ...).
+library, an interactive map, a point-in-zone test, ...). Markings are
+listed in drawing order (bottom to top).
 
 ## Usage
 
@@ -70,12 +71,6 @@ A data frame with columns:
 - `linejoin`:
 
   Line-join style for the outline.
-
-## Details
-
-Markings are listed in drawing order (bottom to top). Shapes on the
-right half of the rink are mirror images of the left half, built from
-the same code.
 
 ## See also
 

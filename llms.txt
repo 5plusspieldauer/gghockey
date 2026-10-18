@@ -82,7 +82,7 @@ style that fits the story; the matching scales are attached for you.
 heatmap <- function(style, ...) {
   ggplot(shots, aes(x, y, z = xg)) +
     annotate_rink(orientation = "vertical", zones = "oz",
-                  colour = "grey60", linewidth = 0.5) +
+                  colour = "grey60") +
     geom_rink_bin(style = style, binwidth = 2, ...) +
     # One shared colour key: fix the limits instead of using each plot's range
     scale_fill_rink(name = "Mean xG", limits = c(0.02, 0.25)) +
@@ -105,29 +105,37 @@ never get bigger than one cell, so they can’t overlap.
 
 [`rink_bin()`](https://5plusspieldauer.github.io/gghockey/reference/rink_bin.md)
 returns the grid as a data frame, so you can derive any per-cell value
-and plot it with `precomputed = TRUE`. Here is each team’s shot share
-minus the other team’s, on a diverging scale:
+and plot it with `precomputed = TRUE`. Raw shooting percentages are
+noisy where there are few shots, so here each cell is pulled towards the
+overall rate in proportion to how little data it has, i.e. it gets `k`
+shots’ worth of the average added:
 
 ``` r
 
-cells <- rink_bin(shots, x, y, binwidth = 3, by = team)
-wide <- merge(
-  cells[cells$team == "Lakeside", c("x", "y", "n")],
-  cells[cells$team == "Northfield", c("x", "y", "n")],
-  by = c("x", "y"), all = TRUE, suffixes = c("_lake", "_north")
-)
-wide[is.na(wide)] <- 0
-wide$value <- wide$n_lake / sum(wide$n_lake) - wide$n_north / sum(wide$n_north)
-wide$n <- wide$n_lake + wide$n_north
+cells <- rink_bin(shots, x, y, value = goal, binwidth = 3)
+avg <- mean(shots$goal)
+k <- 15
 
-ggplot(wide, aes(x, y)) +
-  annotate_rink(orientation = "vertical", zones = "oz", colour = "grey55") +
-  geom_rink_bin(precomputed = TRUE, style = "size", diverging = TRUE, binwidth = 3) +
-  scale_fill_rink_diverging(name = "Shot share", labels = c("Northfield", "Even", "Lakeside")) +
-  labs(title = "Where each team shoots from more")
+maps <- rbind(
+  transform(cells, map = "Raw"),
+  transform(cells, map = "Shrunk (k = 15)", value = (n * value + k * avg) / (n + k))
+)
+
+ggplot(maps, aes(x, y)) +
+  annotate_rink(orientation = "vertical", zones = "oz", colour = "grey35") +
+  geom_rink_bin(precomputed = TRUE, style = "fill", binwidth = 3, gap = 0.2) +
+  scale_fill_rink(name = "Shooting %", palette = rev(hcl.colors(256, "YlGnBu")),
+                  limits = c(0, 0.3), breaks = seq(0, 0.3, 0.1),
+                  labels = scales::label_percent()) +
+  facet_wrap(~map) +
+  theme(legend.position = "bottom")
 ```
 
-![](reference/figures/README-diff-1.png)
+![](reference/figures/README-shrink-1.png)
+
+On the right, the lone shots that went in from the boards stop looking
+like hot spots, and the area in front of the net keeps its high rate
+because it has the volume to back it up.
 
 ## Team colours, facets and logos
 
@@ -145,7 +153,7 @@ pal <- team_palette(
 
 ggplot(shots, aes(x, y, colour = team)) +
   annotate_rink(zones = c("nz", "oz"),
-                logos = list(centre = "man/figures/logo.png"), logo_alpha = 0.35) +
+                logos = list(centre = "man/figures/logo.png"), logo_alpha = 0.7) +
   geom_point(alpha = 0.45, size = 0.9, show.legend = FALSE) +
   scale_colour_team(pal) +
   facet_wrap(~team)

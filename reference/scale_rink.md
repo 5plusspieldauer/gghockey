@@ -25,6 +25,10 @@ styles:
 
   Event-count **alpha** scale for `style = "alpha"`.
 
+Fill limits are yours to choose: the default `NULL` uses the range of
+the data, which changes from plot to plot. Fix `limits` (values outside
+are squished to the ends) when several maps should share one colour key.
+
 ## Usage
 
 ``` r
@@ -115,12 +119,6 @@ scale_alpha_rink(
 ## Value
 
 A ggplot2 scale.
-
-## Details
-
-Fill limits are yours to choose: the default `NULL` uses the range of
-the data, which changes from plot to plot. Fix `limits` (values outside
-are squished to the ends) when several maps should share one colour key.
 
 ## See also
 

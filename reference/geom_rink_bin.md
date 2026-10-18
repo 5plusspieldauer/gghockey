@@ -153,8 +153,7 @@ Without a `z` aesthetic there is no value to average; map `fill` to
 library(ggplot2)
 
 base <- ggplot(shots, aes(x, y, z = xg)) +
-  annotate_rink(orientation = "vertical", zones = "oz",
-                colour = "grey60", linewidth = 0.5)
+  annotate_rink(orientation = "vertical", zones = "oz", colour = "grey60")
 
 base + geom_rink_bin(style = "size", binwidth = 2)
 

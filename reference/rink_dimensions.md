@@ -2,8 +2,8 @@
 
 Starts from an existing set of [rink
 dimensions](https://5plusspieldauer.github.io/gghockey/reference/rink_dims.md)
-and overrides individual fields, checking that every override is a known
-field and a single finite number. Typical uses are matching your data's
+and overrides single fields, checking that each override is a known
+field and a single finite number. Typical uses: matching your data's
 coordinate frame (e.g. `origin_x = -30, origin_y = -15` for
 centre-ice-origin IIHF data) or drawing a non-standard rink.
 
