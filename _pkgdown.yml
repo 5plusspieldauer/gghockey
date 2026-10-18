@@ -1,0 +1,30 @@
+url: https://5plusspieldauer.github.io/gghockey/
+
+template:
+  bootstrap: 5
+  bslib:
+    primary: "#143F84"
+
+reference:
+  - title: Rinks
+    desc: Draw a rink and set up the plot canvas.
+    contents:
+      - annotate_rink
+      - theme_rink
+  - title: Dimensions and geometry
+    desc: Rink sizes, custom rinks and the markings as data.
+    contents:
+      - rink_dims
+      - rink_dimensions
+      - rink_geometry
+  - title: Heatmaps
+    contents:
+      - geom_rink_bin
+      - rink_bin
+      - scale_rink
+  - title: Team colours
+    contents:
+      - team_palette
+  - title: Data
+    contents:
+      - shots

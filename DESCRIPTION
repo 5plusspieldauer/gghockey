@@ -1,0 +1,36 @@
+Package: gghockey
+Title: Ice Hockey Rinks and Spatial Heatmaps for 'ggplot2'
+Version: 0.1.0
+Authors@R:
+    person("Daniel", "Weinberger", , "5plusspieldauer@gmail.com", role = c("aut", "cre", "cph"))
+Description: Draws to-scale ice hockey rinks (IIHF and NHL dimensions, or
+    your own) as 'ggplot2' layers, in horizontal or vertical orientation and
+    cropped to any combination of zones. Adds a binned heatmap geom for
+    on-ice event data whose squares are sized in rink units, so a map looks
+    the same at any export size, plus matched colour, size and alpha scales,
+    a rink theme, team colour palettes and optional centre-ice logos.
+License: MIT + file LICENSE
+URL: https://github.com/5plusspieldauer/gghockey,
+    https://5plusspieldauer.github.io/gghockey/
+BugReports: https://github.com/5plusspieldauer/gghockey/issues
+Depends:
+    R (>= 4.1.0)
+Imports:
+    dplyr (>= 1.1.0),
+    ggplot2 (>= 3.5.0),
+    grDevices,
+    grid,
+    rlang (>= 1.1.0),
+    scales,
+    stats,
+    utils
+Suggests:
+    knitr,
+    png,
+    rmarkdown,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2

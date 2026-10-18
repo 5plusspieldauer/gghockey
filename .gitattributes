@@ -1,0 +1,6 @@
+# Keep text files LF everywhere (matches the .Rproj's LineEndingConversion: Posix)
+* text=auto eol=lf
+
+# Binary files: never touch line endings
+*.png binary
+*.rda binary
